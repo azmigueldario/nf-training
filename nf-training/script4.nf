@@ -1,7 +1,7 @@
 /*
  * pipeline input parameters
  */
-params.reads = "$projectDir/data/ggal/gut_{1,2}.fq"
+params.reads = "$projectDir/data/ggal/*_{1,2}.fq"
 params.transcriptome_file = "$projectDir/data/ggal/transcriptome.fa"
 params.multiqc = "$projectDir/multiqc"
 params.outdir = "results"
@@ -21,6 +21,7 @@ log.info """\
  */
 process INDEX {
     input:
+    cpus 4
     path transcriptome
 
     output:
@@ -33,6 +34,10 @@ process INDEX {
 }
 
 process QUANTIFICATION {
+    tag "Salmon on $sample_id"
+    // sends what is contained in output chunk to publishDir
+    publishDir params.outdir, mode: 'symlink'
+
     input:
     path salmon_index
     tuple val(sample_id), path(reads)

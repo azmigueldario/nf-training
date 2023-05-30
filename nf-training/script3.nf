@@ -2,6 +2,7 @@
  * pipeline input parameters
  */
 params.reads = "$projectDir/data/ggal/gut_{1,2}.fq"
+// glob patterns must be enclosed in single quotes when they have a wild character
 params.transcriptome_file = "$projectDir/data/ggal/transcriptome.fa"
 params.multiqc = "$projectDir/multiqc"
 params.outdir = "results"
@@ -15,4 +16,12 @@ log.info """\
     """
     .stripIndent()
 
+/*
 read_pairs_ch = Channel.fromFilePairs(params.reads)
+read_pairs_ch.view()
+*/
+
+// set operator to define channel
+Channel
+    .fromFilePairs(params.reads, checkIfExists: true)
+    .set {read_pairs_ch}
