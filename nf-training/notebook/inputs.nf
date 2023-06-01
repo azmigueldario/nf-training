@@ -162,8 +162,59 @@ process EXER2 {
     """
 }
 
-workflow {
-    concat_ch = EXER2(transcriptome_file, readsEx_ch)
-    concat_ch.view()
+/*  Input repeaters. The 'each' qualifier lets you repeat a process for each item
+    in a collection. 
+    Can be two different methods or different training values. */
+
+sequences = Channel.fromPath('../data/prots/*.tfa')
+methods = ['regular', 'espresso', 'psicoffee']
+
+process ALIGNSEQUENCES {
+    debug true
+
+    input:
+    path 'seq'
+    each 'mode' // <- each qualifier
+
+    script:
+    """
+    echo t_coffee -in ${seq} -mode ${mode}
+    """
 }
 
+    /*
+    workflow {
+            // repeat value channel
+        concat_ch = EXER2(transcriptome_file, readsEx_ch)
+        concat_ch.view()
+            // apply different values using each qualifier
+        ALIGNSEQUENCES(sequences, methods)
+    }
+    */
+
+reads_ex3 = Channel.fromPath('../data/ggal/*_1.fq')
+aligners = ['salmon', 'kallisto']
+transcriptome_file = "$baseDir/../data/ggal/transcriptome.fa"
+
+process EXER3 {
+    debug true
+    tag "Repeat aligners"
+
+    input:
+    path reads
+    path transcriptome
+    each tool
+
+    output:
+    path 'alignment_results'
+
+    script:
+    """
+    echo $tool -r $reads -t $transcriptome > alignment_results
+    """
+}
+
+workflow {
+    result_ch = EXER3 (reads_ex3, transcriptome_file, aligners)
+    result_ch.view { "To run: ${it.text}" }
+}
