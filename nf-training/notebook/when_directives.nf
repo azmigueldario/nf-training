@@ -74,17 +74,19 @@ process BLASTSEQ{
 
 // To manage subdirectories, we can specify matching patterns.
 
-params.reads = "$projectDir/data/reads/*_{1,2}.fq.gz"
-params.outdir = 'my_results'
+params.reads = "$projectDir/../data/reads/*_{1,2}.fq.gz"
+params.outdir2 = 'my_results'
 samples_ch = Channel.fromFilePairs(params.reads, flat:true)
 
 process FOO{
-    publishDir "$params.outdir/$sampleId/", pattern: '*.fq'
-    publishDir "$params.outdir/$sampleId/counts", pattern: '*_counts.txt'
-    publishDir "$params.outdir/$sampleId/outlooks", pattern: '*_outlooks.txt'
+        // creates a subfolder with the sampleId variable
+    publishDir "$params.outdir2/$sampleId/", pattern: '*.fq'
+        // then it puts the counts and outlook results into subfolders of sampleId
+    publishDir "$params.outdir2/$sampleId/counts", pattern: '*_counts.txt'
+    publishDir "$params.outdir2/$sampleId/outlooks", pattern: '*_outlooks.txt'
 
     input:
-    tuple val(sampleid), path('sample1.fq.gz'), path('sample2.fq.gz')
+    tuple val(sampleId), path('sample1.fq.gz'), path('sample2.fq.gz')
 
     output:
     path "*"
@@ -94,8 +96,8 @@ process FOO{
 
     script:
     """
-    sample1.fq.gz zcat > sample1.fq
-    sample2.fq.gz zcat > sample2.fq
+    < sample1.fq.gz zcat > sample1.fq
+    < sample2.fq.gz zcat > sample2.fq
 
     awk '{S++}END{print s/4}' sample1.fq > sample1_counts.txt
     awk '{S++}END{print s/4}' sample2.fq > sample2_counts.txt
@@ -103,8 +105,6 @@ process FOO{
     head -n 50 sample1.fq > sample1_outlook.txt
     head -n 50 sample1.fq > sample1_outlook.txt
     """
-    
-
 }
 
 
@@ -112,4 +112,5 @@ workflow {
     blast_ch = BLASTSEQ(proteins)
     blast_ch.view { "${it.baseName} contains: ${it.text}"}
         // when applies a function/operator, use {}
+    out_ch = FOO(samples_ch)
 }

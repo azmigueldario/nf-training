@@ -1,1 +1,0 @@
-blastp -query BB11003.tfa -db nr

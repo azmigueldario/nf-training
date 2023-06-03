@@ -42,6 +42,7 @@
         }
 */
 
+/*
 params.dbtype = 'nr'
 params.prot = '../data/prots/*.tfa'
 proteins = Channel.fromPath(params.prot)
@@ -57,16 +58,26 @@ process FIND {
   val type
 
   when:
-  fasta.name =~ /^BB11.*/ && type == 'nr'
+  fasta.name =~ '/^BB11.{*}/ && type == 'nr'
 
   script:
   """
   echo blastp -query $fasta -db nr
   """
 }
+*/
+    /*
+    workflow {
+    result = FIND(proteins, params.dbtype)
+    Channel.fromFilePairs(params.reads, flat:true)
+        .view()
+    }
+    */
 
-workflow {
-  result = FIND(proteins, params.dbtype)
-  Channel.fromFilePairs(params.reads, flat:true)
-    .view()
+
+int fib(int n) {
+    return n < 2 ? 1 : fib(n-1) + fib(n-2)
 }
+
+assert fib(10)==89
+
