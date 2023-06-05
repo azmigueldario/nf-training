@@ -1,13 +1,9 @@
 #!usr/bin/env nextflow
 
-/*
-params.greeting = 'Hello world!'
-params.name = ''
-greetin_ch = Channel.of(params.greeting, "My name is ", params.name)
-*/
-
-params.greeting = 'Hello world!'
-greetin_ch = Channel.of(params.greeting)
+params.greeting = 'Hello world! My name is '
+params.name = "Miguel"
+greetin_ch = Channel.of(params.greeting + params.name)
+    // <- The '+' operator concatenates strings without space
 
 process SPLITLETTERS {
     input:
@@ -27,20 +23,29 @@ process CONVERTTOUPPER {
 
     output:
     stdout
-/*
+    
     """
     cat $y | tr '[a-z]' '[A-Z]'
     """
-*/
+}
 
+process REVERSEORDER {
+    debug true 
+
+    input:
+    path x
+
+    outpud:
+    stdout
+
+    script:
     """
-    rev $y | tr '[a-z]' '[A-Z]'
+    rev $x
     """
 }
 
 workflow {
-    letters_ch = SPLITLETTERS(greetin_ch)
-    results_ch = CONVERTTOUPPER(letters_ch.flatten())
-    results_ch.view()
-
+    letters_ch1 = SPLITLETTERS(greetin_ch)
+    results_ch1 = CONVERTTOUPPER(letters_ch1.flatten())
+    results_ch1.view()
 }

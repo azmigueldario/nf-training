@@ -74,10 +74,14 @@ process FIND {
     }
     */
 
+params.greeting = "Hello world! My name is "
+params.name = "Miguel"
+message = (params.greeting + params.name)
+println(message + "ssss")
+//message = params.greeting.concat(params.name)
+greetin_ch = Channel.of(params.greeting + params.name)
+greetin_ch.view()
 
-int fib(int n) {
-    return n < 2 ? 1 : fib(n-1) + fib(n-2)
-}
 
-assert fib(10)==89
+
 
