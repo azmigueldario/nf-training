@@ -32,7 +32,8 @@ process CONVERTTOUPPER {
     path y
 
     output:
-    stdout
+    stdout emit:upper
+        // the 'emit' statement defines name to use in channel scope
     
     """
     cat $y | tr '[a-z]' '[A-Z]'
@@ -45,11 +46,22 @@ process REVERSEORDER {
     input:
     path x
 
-    outpud:
+    output:
     stdout
 
     script:
     """
     rev $x
     """
+}
+
+
+/*  We can also define custom functions (parameters for Groovy) in our module script.
+    This ones can be easily invoked in another script as if they were processes. */
+
+params.foo = "Hola"
+params.bar = "Mundo!"
+
+def START_RUN() {
+    println "$params.foo $params.bar"
 }

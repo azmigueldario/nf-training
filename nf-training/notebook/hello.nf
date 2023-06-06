@@ -35,7 +35,7 @@ process REVERSEORDER {
     input:
     path x
 
-    outpud:
+    output:
     stdout
 
     script:
